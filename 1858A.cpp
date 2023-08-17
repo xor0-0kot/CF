@@ -15,8 +15,23 @@ using ll = long long;
 constexpr int mXN = 2e5 + 5, inf = INT_MAX - 100, mod = 1e9 + 7;
 constexpr double eps = 1e-8; 
  
+
 void test_case() {
-    
+    int a, b, c;
+    cin >> a >> b >> c;
+    if(a + c == b + c) {
+        if(c % 2 == 0) {
+            cout << "Second\n";
+        } else {
+            cout << "First\n";
+        }
+    } else {
+        if(a + c > b + c) {
+            cout << "First\n";
+        } else {
+            cout << "Second\n";
+        }
+    }
 }
  
 signed main() {
