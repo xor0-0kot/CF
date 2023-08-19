@@ -29,7 +29,7 @@ void test_case() {
         cout << max(now - ak, 0LL) + max(m - k * now - a, 0LL) << '\n';
     }
 }
- 
+
 signed main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
