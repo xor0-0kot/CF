@@ -18,7 +18,7 @@ constexpr double eps = 1e-8;
 void test_case() {
     int m, k, a, ak;
     cin >> m >> k >> a >> ak;
-    if(m <= a) {
+    if(m <= a) { // if m is zero
         cout << 0 << '\n';
     } else {
         int need = m - a;
