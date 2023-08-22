@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-using ll = __int128_t;
+using ll = long long;
 
 #define int long long
 #define pb push_back
