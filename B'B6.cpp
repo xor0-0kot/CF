@@ -16,22 +16,27 @@ constexpr int mXN = 2e5 + 5, inf = INT_MAX - 100, mod = 1e9 + 7, llmod = 1e18+7;
 constexpr double eps = 1e-8; 
  
 void test_case() {
-    string s;
-    cin >> s;
-    bool allA = true;
-    int n = (int)s.size();
-    int mn = inf;
-    for(int i = 1; i<n; ++i) {
-        int cur_mx = -inf;
-        if(s[i-1] != s[i]) {
-            allA = false;
-            cur_mx = max(i - 1, n - i - 1);
-            mn = min(cur_mx, mn);
+    int n, m;
+    cin >> n >> m;
+    vector<int> a(n);
+    int sum = 0;
+    for(int i=0; i<n; ++i) {
+        int x, y;
+        cin >> x >> y;
+        a[i] = x - y;
+        sum += abs(x - y);
+    }
+    srtr(a);    
+    int suffix = sum, preffix = 0;
+    int result = suffix;
+    for(int i=0; i<n; ++i) {
+        preffix += abs(a[i]);
+        suffix -= abs(a[i]);
+        if((i + 1) + ((n - i - 1) * 2) <= m) {
+            result = max(result, preffix + suffix);
         }
     }
-    if(allA) cout << n << '\n';
-    else if(mn == inf) cout << 1 << '\n';
-    else cout << mn + 1 << '\n';
+    cout << result << '\n';
 }
  
 signed main() {
@@ -41,8 +46,8 @@ freopen("output.txt", "w", stdout);
 #endif
     ios_base::sync_with_stdio(0);
     cin.tie(0);
-    int test_cases = 1; 
-//    cin >> test_cases;
+    int test_cases = 1;
+    cin >> test_cases;
     while(test_cases--) {
         test_case();    
     }
