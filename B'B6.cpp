@@ -18,21 +18,29 @@ constexpr double eps = 1e-8;
 void test_case() {
     int n, m;
     cin >> n >> m;
-    vector<int> a(n);
+    vector<pair<int,int>> a(n); vector<pair<int,int>> b(n);
+    int suffix = 0, preffix = 0;
     int sum = 0;
     for(int i=0; i<n; ++i) {
         int x, y;
         cin >> x >> y;
-        a[i] = x - y;
-        sum += abs(x - y);
+        b[i] = {x - y, i};
+        a[i] = {x, y};
+        suffix += x;
+        sum += y;
     }
-    srtr(a);    
-    int suffix = sum, preffix = 0;
+    sort(all(b));
     int result = suffix;
+    if (n == 1) {
+        cout << sum << '\n';
+        return;
+    }
     for(int i=0; i<n; ++i) {
-        preffix += abs(a[i]);
-        suffix -= abs(a[i]);
-        if((i + 1) + ((n - i - 1) * 2) <= m) {
+        preffix += a[b[i].second].second;      
+        suffix -= a[b[i].second].first;
+        int two = i + 1;
+        int one = n - two;
+        if((m + 1) / 2 >= two && (m - two * 2 >= one || one == 0) && one != 1) {
             result = max(result, preffix + suffix);
         }
     }
