@@ -38,30 +38,31 @@ void test_case() {
     for(int i=0; i<n; ++i) {
         cnt += (s[i] - '0');
     }
+    if(cnt == 1) {
+        cout << 0 << '\n';
+        return;
+    }
     vector<int> t1(n + 1), t2(n + 1);
-    t1[0] = 1 % (cnt + 1); if (cnt - 1 > 0) t2[0] = 1 % (cnt - 1);
+    t1[0] = 1 % (cnt + 1), t2[0] = 1 % (cnt - 1);
     for(int i=1; i<=n; ++i) {
-        if (cnt - 1 > 0) {
-            t2[i] = (t2[i-1] * 2) % (cnt-1);
-        }
         t1[i] = (t1[i-1] * 2) % (cnt+1);
+        t2[i] = (t2[i-1] * 2) % (cnt-1);
     }
     int c1 = 0, c2 = 0;
     for(int i=0; i<n; ++i) {
-        if (cnt - 1 > 0) {
-            c2 = (c2 + (s[i] == '1' ? (int)t2[2, n - i - 1] % (cnt - 1) : 0)) % (cnt - 1);
-        }
-        c1 = (c1 + (s[i] == '1'? (int)t1[2, n - i - 1] % (cnt + 1) : 0)) % (cnt + 1);
+        c1 = (c1 + (s[i] == '1'? t1[n - i - 1] % (cnt + 1) : 0)) % (cnt + 1);
+        c2 = (c2 + (s[i] == '1'? t2[n - i - 1] % (cnt - 1): 0)) % (cnt - 1);
     }
     for(int i=0; i<n; ++i) {
         if(s[i] == '0') {
-            c1 = c1 + t1[n-i-1];
-            cout << answer[c1] + 1 << '\n';
-            c1 -= t1[n - i - 1];
+            c1 = (c1 + t1[n-i-1]);
+            cout << answer[c1 % (cnt + 1)] + 1 << '\n';
+            c1 -= t1[n-i-1];
         }
         if(s[i] == '1') {
             c2 = c2 - t2[n-i-1];
-            cout << answer[c2] + 1 << '\n';
+            if(c2 < 0) c2 += (cnt - 1);
+            cout << answer[c2 % (cnt - 1)] + 1 << '\n';
             c2 += t2[n - i - 1];
         }
     }
