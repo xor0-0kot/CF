@@ -17,110 +17,47 @@ constexpr double eps = 1e-8;
  
 int power_of_two[1000];
 
-int ans(int a, int b) {
-    int minn = inf;
-    for(int i=1; i<=a; ++i) {
-        if(a % i == b) {
-            minn = power_of_two[i];
-            break;
-        }
-    }
-    int anss = -1;
-    for(int i=b * 2 + 1; i < a/2; ++i) {
-        int first = inf, second = inf;
-        for(int j=1; j<=(a - i); ++j) {
-            if((a-i) % j == 0 && j > b) {
-                first = j;
-                break;
-            }
-        }
-        for(int j=1; j<=(i - b); ++j) {
-            if((i - b) % j == 0 && j > b) {
-                second = j;
-                break;
-            }
-        }
-        if(minn > power_of_two[first] + power_of_two[second]) {
-            minn = power_of_two[first] + power_of_two[second];
-            anss = i;
-        }
-    }
-    return anss;
-}
-
 void test_case() {
-        int n;
+    int n;
     cin >> n;
-    vector<int> aa(n), bb(n);
+    vector<int> a(n), b(n);
     for(int i = 0; i<n; ++i) {
-        cin >> aa[i];
+        cin >> a[i];
     }
     for(int i=0; i<n; ++i) {
-        cin >> bb[i];
+        cin >> b[i];
     }
-    vector<pair<int,int>> done;
+    vector<vector<bool>> answer(1001, vector<bool>(n));  
+    vector<int> done(n, -1); vector<bool> blocked(n);
     bool zeroes = true;
-    vector<int> a, b;
-    for(int i=0; i<n; ++i) {
-        if(aa[i] != bb[i]) {zeroes = false; a.push_back(aa[i]), b.push_back(bb[i]);}
-    }  
-    n = a.size();
-    done.resize(n, {-1,-1});
-    vector<vector<pair<bool,bool>>> answer(51, vector<pair<bool,bool>>(n));
-    for(int i=0; i<n; ++i) {
-        if(b[i] >= (a[i] + 1) / 2) {
-            cout << -1 << '\n';
-            return;
-        } 
-    }
     int cnt = n;
+    for(int i=0; i<n; ++i) {
+        if(a[i] != b[i]) zeroes = false;
+        if(a[i] == b[i]) {blocked[i] = true; cnt--;}
+    }
     if(zeroes) {
         cout << 0 << '\n';
         return;
     }
-    int cur = 0;
-    for (int i = 0; i < n; ++i) {
-        int cur = ans(a[i], b[i]);
-        if (cur != -1) {
-            int first = a[i] - cur, second = cur - b[i];
-            for (int j = 1; j <= first; ++j) {
-                if (first % j == 0 && j > b[i]) {
-                    answer[j][i].first = true;
-                }
-            }
-            for (int j = 1; j <= first; ++j) {
-                if (second % j == 0 && j > b[i]) {
-                    answer[j][i].second = true;
-                }
-            }
-            cnt+=1;
-        } else {
-            int cur = a[i] - b[i];
-            for (int j = 1; j <= cur; ++j) {
-                if (cur % j == 0 && j > b[i]) {
-                    answer[j][i].first = true;
-                }
+
+    for(int i=0; i<n; ++i) {
+        for(int j=1; j <= 1000; ++j) {
+            if(a[i] % j == b[i]) {
+                answer[j][i] = true;
             }
         }
     }
     int res = 0;
     for(int i=1; i<=1000; ++i) {
         bool fnd = false;
-        for (int j = 0; j < answer[i].size(); ++j) {
-            if (answer[i][j].first && done[j].first == -1) {
-                fnd = true;
+        for (int j = 0; j < n; ++j) {
+            if (answer[i][j] && done[j] == -1 && !blocked[j]) {
                 cnt--;
-                done[j].first = i;
-            } else if (answer[i][j].first && done[j].first != -1 && fnd) {
-                res -= power_of_two[done[j].first];
+                fnd = true;
+                done[j] = i;
+            } else if(answer[i][j] && done[j] && fnd) {
+                res -= power_of_two[done[j]];
             }
-            if (answer[i][j].second && done[j].second == -1) {
-                fnd = true;
-                cnt--;
-                done[j].second = i;
-            } else if (answer[i][j].second && done[j].second != -1 && fnd) {
-                res -= power_of_two[done[j].second];
-            } 
         }
         if (fnd) {
             res += power_of_two[i];
@@ -129,7 +66,8 @@ void test_case() {
             break;
         }
     }
-    cout << res << '\n';
+    if(cnt != 0) cout << -1 << '\n';
+    else cout << res << '\n';
 }
  
 signed main() {
