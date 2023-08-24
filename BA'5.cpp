@@ -57,6 +57,7 @@ void test_case() {
                 done[j] = i;
             } else if(answer[i][j] && done[j] && fnd) {
                 res -= power_of_two[done[j]];
+                done[j] = i;
             }
         }
         if (fnd) {
