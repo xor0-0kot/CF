@@ -16,59 +16,47 @@ constexpr int mXN = 2e5 + 5, inf = INT_MAX - 100, mod = 1e9 + 7, llmod = INT64_M
 constexpr double eps = 1e-8; 
  
 int power_of_two[1000];
+vector<int> a, b;
+vector<bool> blocks[2][51];
+bool build(int a, int b) {
+    int cur = b - a;
+    if(a - b <= a / 2) {
+        return false;
+    }
+    if(b * 2 + 1 >= a / 2) {
+        int mn = inf;
+        for(int i=1; i<=(a-b); ++i) {
+            if(a % i == b) {
+                if(mn = inf) mn = i;
+                blocks[1][i].push_back(mn);
+            }
+        }
+        return true;
+    } else {
+        int first = b + 1, second = inf;
+        int diff = a - b;
+        for(int i=1; i*(b+1)<a/2; ++i) {
+            if(a - b + first > b) blocks[1][i*(b+1)].push_back(b + 1);
+        }
+        second = b + 1 + (a - b) % (b + 1);
+        for(int i=1; i*second<a/2; ++i) {
+            if(a - b + second > b) blocks[1][i*second].push_back(second);
+        }
+        return true;
+    }
+}
 
 void test_case() {
     int n;
     cin >> n;
-    vector<int> a(n), b(n);
+    a.resize(n), b.resize(n);
     for(int i = 0; i<n; ++i) {
         cin >> a[i];
     }
     for(int i=0; i<n; ++i) {
         cin >> b[i];
     }
-    vector<vector<bool>> answer(1001, vector<bool>(n));  
-    vector<int> done(n, -1); vector<bool> blocked(n);
-    bool zeroes = true;
-    int cnt = n;
-    for(int i=0; i<n; ++i) {
-        if(a[i] != b[i]) zeroes = false;
-        if(a[i] == b[i]) {blocked[i] = true; cnt--;}
-    }
-    if(zeroes) {
-        cout << 0 << '\n';
-        return;
-    }
-
-    for(int i=0; i<n; ++i) {
-        for(int j=1; j <= 1000; ++j) {
-            if(a[i] % j == b[i]) {
-                answer[j][i] = true;
-            }
-        }
-    }
-    int res = 0;
-    for(int i=1; i<=1000; ++i) {
-        bool fnd = false;
-        for (int j = 0; j < n; ++j) {
-            if (answer[i][j] && done[j] == -1 && !blocked[j]) {
-                cnt--;
-                fnd = true;
-                done[j] = i;
-            } else if(answer[i][j] && done[j] && fnd) {
-                res -= power_of_two[done[j]];
-                done[j] = i;
-            }
-        }
-        if (fnd) {
-            res += power_of_two[i];
-        }
-        if(cnt == 0) {
-            break;
-        }
-    }
-    if(cnt != 0) cout << -1 << '\n';
-    else cout << res << '\n';
+    build(a[0], b[0]);
 }
  
 signed main() {
