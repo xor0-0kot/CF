@@ -14,49 +14,78 @@ using ll = long long;
  
 constexpr int mXN = 2e5 + 5, inf = INT_MAX - 100, mod = 1e9 + 7, llmod = INT64_MAX;
 constexpr double eps = 1e-8; 
- 
-int power_of_two[1000];
-vector<int> a, b;
-vector<bool> blocks[2][51];
-bool build(int a, int b) {
-    int cur = b - a;
-    if(a - b <= a / 2) {
-        return false;
+
+int power_of_two[65];
+vector<vector<vector<int>>> pair_solves;
+
+void find_solution(vector<int>& cur, int a, int b, int pos, int left) {
+    if(a == b) {
+        pair_solves[pos].push_back(cur);
+        return;
     }
-    if(b * 2 + 1 >= a / 2) {
-        int mn = inf;
-        for(int i=1; i<=(a-b); ++i) {
+    if(left == 2) {
+        for(int i=1; i<=50; ++i) {
             if(a % i == b) {
-                if(mn = inf) mn = i;
-                blocks[1][i].push_back(mn);
+                cur.push_back(i);
+                find_solution(cur, a % i, b, pos, left+1);
+                cur.pop_back();
             }
         }
-        return true;
-    } else {
-        int first = b + 1, second = inf;
-        int diff = a - b;
-        for(int i=1; i*(b+1)<a/2; ++i) {
-            if(a - b + first > b) blocks[1][i*(b+1)].push_back(b + 1);
+    }
+    for(int i=1; i<=50; ++i) {
+        if((a % i >= b * 2 + 1 || a % i == b) && i <= a) {
+            cur.push_back(i);
+            find_solution(cur, a % i, b, pos, left+1);
+            cur.pop_back();
         }
-        second = b + 1 + (a - b) % (b + 1);
-        for(int i=1; i*second<a/2; ++i) {
-            if(a - b + second > b) blocks[1][i*second].push_back(second);
-        }
-        return true;
     }
 }
 
 void test_case() {
     int n;
     cin >> n;
-    a.resize(n), b.resize(n);
-    for(int i = 0; i<n; ++i) {
+    pair_solves.resize(n);
+    vector<int> a(n), b(n);
+    for(int i=0; i<n; ++i) {
         cin >> a[i];
     }
     for(int i=0; i<n; ++i) {
         cin >> b[i];
     }
-    build(a[0], b[0]);
+    for(int i=0; i<n; ++i) {
+        if(b[i] *  2 + 1 > a[i] && a[i] != b[i]) {
+            cout << -1 << '\n';
+            return;
+        }
+        vector<int> cur;
+        find_solution(cur, a[i], b[i], i, 0);
+    }
+    vector<int> picked(51);
+    int res = power_of_two[51];
+    for(int k=50; k>=1; --k) {
+        bool possible = true;
+        for(int i=0; i<n; ++i) {
+            int cnt = 0;
+            for(int j=0; j<pair_solves[i].size(); ++j) {
+                bool fnd = false;
+                for(int l = 0; l<pair_solves[i][j].size(); ++l) {
+                    if(k == pair_solves[i][j][l] || picked[pair_solves[i][j][l]]) {
+                        fnd=true;
+                    }
+                }
+                if(fnd) cnt++;
+            }
+            if(cnt == pair_solves[i].size()) {
+                possible = false;
+                break;
+            }
+        }
+        if(possible) {
+            res -= power_of_two[k];
+            picked[k] = true;
+        }
+    }
+    cout << res - 2 << '\n';
 }
  
 signed main() {
@@ -69,7 +98,7 @@ freopen("output.txt", "w", stdout);
     int test_cases = 1;
 //    cin >> test_cases;
     power_of_two[0] = 1;
-    for(int i=1; i<100; ++i) {
+    for(int i=1; i<65; ++i) {
         power_of_two[i] = (power_of_two[i-1] * 2);
     }
     while(test_cases--) {
