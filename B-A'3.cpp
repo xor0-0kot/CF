@@ -2,7 +2,6 @@
 using namespace std;
 using ll = long long;
 
-#define int long long
 #define pb push_back
 #define mp make_pair
 #define fi first
@@ -12,59 +11,66 @@ using ll = long long;
 #define srt(a) sort(a.begin(), a.end());
 #define srtr(a) sort(a.rbegin(), a.rend());
 
-constexpr int mXN = 2e5 + 5, inf = INT_MAX - 100, mod = 1e9 + 7, llmod = 1e18+7;
+constexpr int mXN = 4e3 + 5, inf = INT_MAX - 100;
 constexpr double eps = 1e-8;
 
 void test_case() {
     int n;
     cin >> n;
-    int m = 2 * n;
-    vector<pair<int,int>> a(2 * n), a2;
-    for(int i=0; i<m; ++i) {
-        char c; int x;
-        cin >> c;
-        if(c == 'W') {
-            a[i].first = 1;
-        } else a[i].first = 2;
-        cin >> a[i].second;
+    vector<vector<int>> d(3000, vector<int>(3000, inf));
+    vector<int> cnt_white(3000, inf), cnt_black(3000, inf);
+    vector<vector<int>> bad_w(5000, vector<int>(5000)), bad_b(5000, vector<int>(5000));
+    vector<int> w_in_a(5000), b_in_a(5000);
+    vector<pair<char, int>> a(n * 2 + 2);
+    for (int i = 0; i < 2 * n; ++i) {
+        char type;
+        int pos;
+        cin >> type >> pos;
+        a[i] = {type, pos-1};
+        if (type == 'W') {
+            w_in_a[pos-1] = i;
+        } else {
+            b_in_a[pos-1] = i;
+        }
     }
-    a2 = a;
-    int res1 = 0, res2 = 0;
-    for(int i=0; i<m; ++i) {
-        int ind = -1, mn = inf;
-        for(int j=i; j>=0; --j) {
-            if(a2[i].first == a2[j].first) {
-                if(a2[j].second > a2[i].second) {
-                    if(mn > a2[j].second) {
-                        ind = j;
-                        mn = a2[j].second;
-                    }
-                }
+    int cur_w = 0, cur_b = 0;
+    for(int i=0; i<2*n; ++i) {
+        int cnt = 0;
+        for(int j=i-1; j>=0; --j) {
+            if(a[j].second >= a[i].second && a[i].first == a[j].first) {
+                cnt++;
             }
         }
-        if(ind != -1) {
-            res1 += i - ind;
-            rotate(a2.rbegin() + (m - i - 1), a2.rbegin() + (m - i), a2.rbegin() + (m - ind));
+        if (a[i].first == 'W')
+            cnt_white[a[i].second] = cnt;
+        else {
+            cnt_black[a[i].second] = cnt;
         }
     }
-    for(int i=0; i<m; ++i) {
-        int ind = -1, mx = -inf;
-        for(int j=i; j<m; ++j) {
-            if(a[i].first == a[j].first) {
-                if(a[j].second < a[i].second) {
-                    if(mx < a[j].second) {
-                        ind = j;
-                        mx = a[j].second;
-                    }
-                }
+    for (int i = 0; i < n; ++i) {
+        bad_w[0][i] = i <= a[0].second && a[0].first == 'W';
+        bad_b[0][i] = i <= a[0].second && a[0].first == 'B';
+    }
+    cur_b = 0, cur_w = 0;
+    for(int i=1; i<2*n; ++i) {
+        for(int j=0; j<=n+1; ++j) {
+            if(a[i].first == 'W') {
+                bad_b[i][j] = bad_b[i-1][j];
+                bad_w[i][j] = bad_w[i-1][j] + (a[i].second >= j);
+            } else {
+                bad_w[i][j] = bad_w[i-1][j];
+                bad_b[i][j] = bad_b[i-1][j] + (a[i].second >= j);
             }
         }
-        if(ind != -1) {
-            res2 += ind - i;
-            rotate(a.begin() + i, a.begin() + i + 1, a.begin() + ind + 1);
+    }
+    d[0][0] = 0;
+    for (int i = 0; i <= n; ++i) {
+        for (int j = 0; j <= n; ++j) {
+            if (i != n) d[i + 1][j] = min(d[i + 1][j], d[i][j] + cnt_black[i] + bad_w[b_in_a[i]][j]);
+            if (j != n) d[i][j + 1] = min(d[i][j + 1], d[i][j] + cnt_white[j] + bad_b[w_in_a[j]][i]);
         }
     }
-    cout << min(res1, res2) << '\n';
+    cout << d[n][n] << '\n';
 }
 
 
